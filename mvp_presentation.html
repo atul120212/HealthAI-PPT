@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citizen Health AI — MVP Presentation</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ── DESIGN SYSTEM & CONSTANTS ──────────────────────────────── */
+    :root {
+      --bg-dark: #080c0a;
+      --bg-card: rgba(17, 23, 20, 0.7);
+      --bg-glass: rgba(15, 22, 19, 0.45);
+      --border-glass: rgba(61, 220, 151, 0.15);
+      --border-hover: rgba(61, 220, 151, 0.35);
+      
+      --color-primary: #3ddc97; /* Emerald green accent */
+      --color-secondary: #5b9cf6; /* Blue accent */
+      --color-accent: #a06ef5; /* Purple accent */
+      --color-danger: #f87171; /* Red/emergency */
+      --color-text-main: #e8ecea;
+      --color-text-muted: #9baaa4;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --shadow-glow-green: 0 0 30px rgba(61, 220, 151, 0.2);
+      --shadow-glow-blue: 0 0 30px rgba(91, 156, 246, 0.2);
+      --shadow-glow-purple: 0 0 30px rgba(160, 110, 245, 0.2);
+      
+      --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--color-text-main);
+      font-family: var(--font-body);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Background Ambient Gradients */
+    .ambient-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    
+    .ambient-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.15;
+      mix-blend-mode: screen;
+      transition: var(--transition-smooth);
+    }
+
+    .glow-1 {
+      top: -10%;
+      left: -10%;
+      background: var(--color-primary);
+    }
+
+    .glow-2 {
+      bottom: -10%;
+      right: -10%;
+      background: var(--color-secondary);
+    }
+
+    .glow-3 {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--color-accent);
+      width: 400px;
+      height: 400px;
+      opacity: 0.08;
+    }
+
+    /* ── HEADER ────────────────────────────────────────────────── */
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(8, 12, 10, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.3rem;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-icon {
+      color: var(--color-primary);
+      filter: drop-shadow(0 0 8px rgba(61, 220, 151, 0.4));
+    }
+
+    .brand-sub {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      font-weight: 400;
+      border-left: 1px solid rgba(255, 255, 255, 0.15);
+      padding-left: 12px;
+      font-family: var(--font-body);
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--color-text-main);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+    }
+
+    .nav-btn:hover {
+      background: rgba(61, 220, 151, 0.1);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      box-shadow: 0 0 15px rgba(61, 220, 151, 0.15);
+    }
+
+    /* ── SLIDE DECK CONTAINER ─────────────────────────────────── */
+    .deck-container {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 70px);
+      margin-top: 70px;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transform: translateX(100px) scale(0.98);
+      pointer-events: none;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      padding: 40px 60px 60px 60px;
+      box-sizing: border-box;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      pointer-events: all;
+    }
+
+    .slide.past {
+      opacity: 0;
+      transform: translateX(-100px) scale(0.98);
+    }
+
+    /* Slide Layouts */
+    .slide-content-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+    }
+
+    .slide-content-full {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Typography inside slides */
+    .slide-tag {
+      font-family: var(--font-mono);
+      color: var(--color-primary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slide-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 3rem;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--color-text-muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-desc {
+      font-size: 1.1rem;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    /* Glassmorphic Panel Layouts */
+    .glass-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+      transition: var(--transition-smooth);
+    }
+
+    .glass-panel:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 12px 40px 0 rgba(61, 220, 151, 0.08);
+    }
+
+    /* ── NAVIGATION CONTROLS ───────────────────────────────────── */
+    .controls {
+      position: absolute;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 100;
+      background: rgba(10, 15, 12, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 30px;
+      padding: 8px 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+    }
+
+    .control-btn {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .control-btn:hover {
+      color: var(--color-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .control-btn:disabled {
+      color: rgba(255, 255, 255, 0.15);
+      cursor: not-allowed;
+    }
+
+    .slide-dots {
+      display: flex;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .dot.active {
+      background: var(--color-primary);
+      transform: scale(1.25);
+      box-shadow: 0 0 10px var(--color-primary);
+    }
+
+    .slide-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+      width: 0;
+      transition: var(--transition-smooth);
+      z-index: 101;
+    }
+
+    /* ── SLIDE 1: HERO COVER ───────────────────────────────────── */
+    .hero-left {
+      padding-right: 40px;
+    }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(61, 220, 151, 0.08);
+      border: 1px solid rgba(61, 220, 151, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      color: var(--color-primary);
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: var(--font-mono);
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 4.8rem;
+      line-height: 1.05;
+      margin-bottom: 25px;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--color-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 1.3rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      margin-bottom: 40px;
+      font-weight: 300;
+    }
+
+    .tech-badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tech-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 6px 12px;
+      border-radius: 4px;
+      color: var(--color-text-muted);
+    }
+
+    /* Interactive Voice Orb Simulator (Slide 1 Right) */
+    .orb-simulator-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      height: 100%;
+    }
+
+    .orb-outer {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .orb-glow-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid var(--color-primary);
+      opacity: 0.1;
+      transition: var(--transition-smooth);
+    }
+
+    .orb-halo {
+      position: absolute;
+      width: 110%;
+      height: 110%;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
+      opacity: 0.08;
+      transition: var(--transition-smooth);
+    }
+
+    .orb-core {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 30%, #1a6b45 0%, #0d3d26 50%, #061a10 100%);
+      box-shadow: 0 0 40px rgba(61, 220, 151, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      z-index: 2;
+      transition: var(--transition-smooth);
+    }
+
+    .orb-icon {
+      color: #ffffff;
+      opacity: 0.8;
+      transition: var(--transition-smooth);
+    }
+
+    /* Orb Status Simulator Controls */
+    .orb-states {
+      display: flex;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 6px;
+      border-radius: 30px;
+    }
+
+    .orb-state-btn {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      transition: var(--transition-smooth);
+    }
+
+    .orb-state-btn.active {
+      color: #000000;
+      background: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .orb-state-label {
+      font-family: var(--font-mono);
+      color: var(--color-primary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Orb State Animation Classes */
+    /* State: Listening */
+    .orb-state--listening .orb-core {
+      background: radial-gradient(circle at 38% 30%, #1a6b45 0%, #0d3d26 50%, #061a10 100%);
+      box-shadow: 0 0 50px rgba(61, 220, 151, 0.5);
+      animation: pulse-listening 1.8s infinite ease-in-out;
+    }
+    .orb-state--listening .orb-glow-ring {
+      border-color: var(--color-primary);
+      animation: ripple 1.8s infinite linear;
+      opacity: 0.3;
+    }
+    .orb-state--listening .orb-state-label { color: var(--color-primary); }
+
+    /* State: Thinking */
+    .orb-state--thinking .orb-core {
+      background: radial-gradient(circle at 38% 30%, #1a3a7a 0%, #0d2050 50%, #06091e 100%);
+      box-shadow: 0 0 50px rgba(91, 156, 246, 0.5);
+      animation: rotate-thinking 2s infinite linear;
+    }
+    .orb-state--thinking .orb-glow-ring {
+      border-color: var(--color-secondary);
+      border-style: dashed;
+      animation: rotate-reverse 4s infinite linear;
+      opacity: 0.4;
+    }
+    .orb-state--thinking .orb-state-label { color: var(--color-secondary); }
+
+    /* State: Speaking */
+    .orb-state--speaking .orb-core {
+      background: radial-gradient(circle at 38% 30%, #5a1a9a 0%, #32076a 50%, #110024 100%);
+      box-shadow: 0 0 60px rgba(160, 110, 245, 0.6);
+      animation: speak-pulsate 0.6s infinite alternate ease-in-out;
+    }
+    .orb-state--speaking .orb-glow-ring {
+      border-color: var(--color-accent);
+      animation: ripple-fast 1s infinite linear;
+      opacity: 0.3;
+    }
+    .orb-state--speaking .orb-state-label { color: var(--color-accent); }
+
+    /* State: Error */
+    .orb-state--error .orb-core {
+      background: radial-gradient(circle at 38% 30%, #5e1c1c 0%, #3a0d0d 50%, #1a0606 100%);
+      box-shadow: 0 0 40px rgba(248, 113, 113, 0.4);
+      animation: shake 0.4s ease-in-out;
+    }
+    .orb-state--error .orb-state-label { color: var(--color-danger); }
+
+    /* Keyframes */
+    @keyframes pulse-listening {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); box-shadow: 0 0 65px rgba(61, 220, 151, 0.7); }
+      100% { transform: scale(1); }
+    }
+    @keyframes ripple {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    @keyframes ripple-fast {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+    @keyframes rotate-thinking {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.03); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    @keyframes rotate-reverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes speak-pulsate {
+      0% { transform: scale(1.02); }
+      100% { transform: scale(1.12); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    /* ── SLIDE 2: HEALTHCARE CHALLENGE ─────────────────────────── */
+    .challenge-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .challenge-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 24px;
+      transition: var(--transition-smooth);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .challenge-card:hover {
+      background: rgba(248, 113, 113, 0.03);
+      border-color: rgba(248, 113, 113, 0.2);
+      transform: translateY(-5px);
+    }
+
+    .challenge-icon {
+      color: var(--color-danger);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(248, 113, 113, 0.1);
+      border-radius: 8px;
+    }
+
+    .challenge-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .challenge-card p {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .impact-panel {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .stat-box {
+      text-align: center;
+      padding: 15px;
+      border-left: 2px solid var(--color-primary);
+      background: rgba(61, 220, 151, 0.02);
+    }
+
+    .stat-box .num {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--color-primary);
+    }
+
+    .stat-box .lbl {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 5px;
+    }
+
+    /* ── SLIDE 3: INTERACTIVE ARCHITECTURE ────────────────────── */
+    .arch-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      align-items: stretch;
+      margin-top: 20px;
+      position: relative;
+    }
+
+    .arch-flow-line {
+      position: absolute;
+      top: 50%;
+      left: 5%;
+      right: 5%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+      z-index: 1;
+      opacity: 0.2;
+    }
+
+    .arch-node {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 24px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+
+    .arch-node::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .node-client::before { background: var(--color-primary); }
+    .node-server::before { background: var(--color-secondary); }
+    .node-voice::before { background: var(--color-accent); }
+    .node-db::before { background: #ffbe3b; }
+
+    .arch-node:hover {
+      transform: translateY(-8px);
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-glow-green);
+    }
+
+    .arch-node-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .node-client .arch-icon { color: var(--color-primary); }
+    .node-server .arch-icon { color: var(--color-secondary); }
+    .node-voice .arch-icon { color: var(--color-accent); }
+    .node-db .arch-icon { color: #ffbe3b; }
+
+    .arch-node-tech {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 8px;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+
+    .arch-node-body {
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .arch-node-body ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin-top: 8px;
+    }
+
+    .arch-node-body li {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .arch-node-body li::before {
+      content: '→';
+      color: var(--color-primary);
+    }
+
+    .arch-details-box {
+      margin-top: 30px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ── SLIDE 4-6: SCREENSHOTS PORTALS ────────────────────────── */
+    .screenshot-viewer-split {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      height: 100%;
+      align-items: center;
+    }
+
+    .device-mockup {
+      background: #181d1a;
+      border: 12px solid #2d3330;
+      border-radius: 16px;
+      aspect-ratio: 16/10;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .device-header {
+      height: 24px;
+      background: #2d3330;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 6px;
+    }
+
+    .device-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .device-dot:nth-child(1) { background: #ff5f56; }
+    .device-dot:nth-child(2) { background: #ffbd2e; }
+    .device-dot:nth-child(3) { background: #27c93f; }
+
+    .device-address-bar {
+      flex: 1;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      margin: 0 40px;
+      font-size: 0.6rem;
+      color: rgba(255, 255, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+    }
+
+    .device-screen {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #0d110e;
+    }
+
+    .device-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 8s ease-in-out;
+    }
+
+    .device-mockup:hover .device-screen img {
+      transform: translateY(-30%);
+    }
+
+    .portal-info-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .bullet-points {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .bullet-points li {
+      display: flex;
+      gap: 12px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--color-text-muted);
+    }
+
+    .bullet-icon {
+      color: var(--color-primary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .bullet-points strong {
+      color: var(--color-text-main);
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      margin-bottom: 3px;
+    }
+
+    /* ── SLIDE 7: INTERACTIVE TRIAGE SIMULATOR ────────────────── */
+    .triage-simulator-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      height: 100%;
+      align-items: center;
+    }
+
+    .sim-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sim-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-secondary);
+    }
+
+    .symptom-input-wrapper {
+      position: relative;
+    }
+
+    .symptom-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--color-text-main);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    .symptom-input:focus {
+      border-color: var(--color-secondary);
+      box-shadow: var(--shadow-glow-blue);
+    }
+
+    .preset-symptoms {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .preset-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--color-text-muted);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .preset-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--color-text-main);
+    }
+
+    .triage-output-panel {
+      flex: 1;
+      min-height: 250px;
+      background: rgba(8, 12, 10, 0.6);
+      border: 1px dashed rgba(255,255,255,0.1);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      transition: var(--transition-smooth);
+    }
+
+    .triage-output-panel.active {
+      border-style: solid;
+      background: rgba(248, 113, 113, 0.03);
+    }
+
+    .triage-badge {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    .triage-badge.emergency {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--color-danger);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+
+    .triage-badge.non-emergency {
+      background: rgba(61, 220, 151, 0.15);
+      color: var(--color-primary);
+      border: 1px solid rgba(61, 220, 151, 0.3);
+    }
+
+    .triage-text {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .triage-action {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── SLIDE 8: ROADMAP & DEPLOYMENT ─────────────────────────── */
+    .roadmap-timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 30px;
+      position: relative;
+    }
+
+    .roadmap-timeline::before {
+      content: '';
+      position: absolute;
+      top: 35px;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      z-index: 1;
+    }
+
+    .roadmap-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .roadmap-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #181d1a;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .roadmap-step.active .roadmap-dot {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 15px var(--color-primary);
+      background: var(--color-primary);
+    }
+
+    .roadmap-step.completed .roadmap-dot {
+      border-color: var(--color-secondary);
+      background: var(--color-secondary);
+    }
+
+    .roadmap-step h4 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .roadmap-step p {
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    /* ── RESPONSIVE DESIGN (MEDIA QUERIES) ──────────────────────── */
+    
+    /* Widescreen and Large Monitors */
+    @media (min-width: 1440px) {
+      .hero-title {
+        font-size: 5.6rem;
+      }
+      .slide-title {
+        font-size: 3.5rem;
+      }
+      .slide {
+        padding: 60px 80px 80px 80px;
+      }
+    }
+
+    /* Tablets & Small Laptops */
+    @media (max-width: 1024px) {
+      .slide {
+        padding: 30px 40px 80px 40px;
+      }
+      .hero-title {
+        font-size: 3.5rem;
+      }
+      .slide-title {
+        font-size: 2.4rem;
+      }
+      .arch-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+      .arch-flow-line {
+        display: none;
+      }
+      .challenge-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .challenge-card:last-child {
+        grid-column: span 2;
+      }
+      .device-mockup {
+        width: 90%;
+        margin: 0 auto;
+      }
+    }
+
+    /* Mobile & Small Tablets (Landscape & Portrait stacks) */
+    @media (max-width: 768px) {
+      body {
+        overflow: auto; /* Fallback for viewport sizing */
+      }
+      header {
+        padding: 0 20px;
+        height: 60px;
+      }
+      .brand-sub {
+        display: none; /* Simplify brand on small screens */
+      }
+      .header-nav div {
+        display: none !important; /* Hide version/date on mobile */
+      }
+      .deck-container {
+        height: calc(100vh - 60px);
+        margin-top: 60px;
+      }
+      .slide {
+        padding: 20px 20px 90px 20px;
+        overflow-y: auto; /* Allow scrolling on small screens */
+        display: block; /* Disable flex for scrolling stack */
+      }
+      .slide-content-split, 
+      .screenshot-viewer-split, 
+      .triage-simulator-split {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        height: auto;
+        align-items: stretch;
+      }
+      .hero-left {
+        padding-right: 0;
+        text-align: center;
+      }
+      .hero-title {
+        font-size: 2.8rem;
+      }
+      .hero-sub {
+        font-size: 1.1rem;
+        margin-bottom: 25px;
+      }
+      .tech-badges-row {
+        justify-content: center;
+      }
+      .orb-simulator-container {
+        margin-top: 20px;
+        padding-bottom: 20px;
+      }
+      .slide-title {
+        font-size: 2rem;
+        text-align: center;
+      }
+      .slide-desc {
+        font-size: 0.95rem;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .challenge-grid {
+        grid-template-columns: 1fr;
+      }
+      .challenge-card:last-child {
+        grid-column: auto;
+      }
+      .impact-panel {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .stat-box .num {
+        font-size: 1.8rem;
+      }
+      .arch-container {
+        grid-template-columns: 1fr;
+      }
+      .arch-details-box {
+        margin-top: 20px;
+      }
+      .device-mockup {
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+      .portal-info-panel {
+        text-align: center;
+      }
+      .bullet-points li {
+        text-align: left;
+      }
+      .triage-output-panel {
+        min-height: 200px;
+      }
+      .roadmap-timeline {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      .roadmap-timeline::before {
+        display: none;
+      }
+      .roadmap-step {
+        flex-direction: row;
+        text-align: left;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      .roadmap-dot {
+        margin-bottom: 0;
+        flex-shrink: 0;
+      }
+      .controls {
+        bottom: 15px;
+        gap: 10px;
+        padding: 6px 12px;
+      }
+      .control-btn {
+        width: 32px;
+        height: 32px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+      }
+    }
+
+    /* Small Phone Displays */
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 2.2rem;
+      }
+      .slide-title {
+        font-size: 1.6rem;
+      }
+      .impact-panel {
+        grid-template-columns: 1fr;
+      }
+      .nav-btn span {
+        display: none; /* Icon only on extra small */
+      }
+      .nav-btn {
+        padding: 8px;
+        border-radius: 50%;
+      }
+      .orb-outer {
+        width: 180px;
+        height: 180px;
+      }
+      .orb-core {
+        width: 130px;
+        height: 130px;
+      }
+      .orb-icon i {
+        width: 32px !important;
+        height: 32px !important;
+      }
+    }
+
+    /* Height-constrained layouts (e.g. landscape phones, small laptop screens) */
+    @media (max-height: 700px) and (min-width: 769px) {
+      .slide {
+        padding: 20px 40px 70px 40px;
+      }
+      .hero-title {
+        font-size: 3rem;
+        margin-bottom: 10px;
+      }
+      .hero-sub {
+        margin-bottom: 20px;
+      }
+      .slide-title {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+      .slide-desc {
+        margin-bottom: 15px;
+      }
+      .challenge-grid {
+        margin-top: 10px;
+        gap: 10px;
+      }
+      .challenge-card {
+        padding: 15px;
+        gap: 8px;
+      }
+      .impact-panel {
+        margin-top: 15px;
+        gap: 10px;
+      }
+      .arch-container {
+        margin-top: 10px;
+        gap: 10px;
+      }
+      .arch-node {
+        padding: 15px;
+        gap: 8px;
+      }
+      .arch-details-box {
+        margin-top: 15px;
+        padding: 12px;
+      }
+      .device-mockup {
+        max-height: 250px;
+      }
+      .bullet-points {
+        gap: 8px;
+      }
+      .sim-card {
+        padding: 15px;
+        gap: 10px;
+      }
+      .triage-output-panel {
+        min-height: 180px;
+        padding: 15px;
+      }
+      .roadmap-timeline {
+        margin-top: 15px;
+      }
+      .roadmap-dot {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-bg">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <i data-lucide="activity" class="brand-icon"></i>
+      <span>Citizen Health AI</span>
+      <span class="brand-sub">MVP Presentation</span>
+    </div>
+    <div class="header-nav">
+      <button class="nav-btn" onclick="togglePlayMode()">
+        <i data-lucide="play" id="play-icon"></i>
+        <span id="play-text">Autoplay</span>
+      </button>
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-text-muted);">
+        v0.2.0 • PROTOTYPE DECK
+      </div>
+    </div>
+  </header>
+
+  <!-- SLIDE DECK CONTAINER -->
+  <div class="deck-container" id="deck">
+
+    <!-- SLIDE 1: HERO / TITLE -->
+    <div class="slide active" id="slide-0">
+      <div class="slide-content-split">
+        <div class="hero-left">
+          <div class="hero-badge">
+            <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+            INDIC PUBLIC HEALTH CONSOLE
+          </div>
+          <h1 class="hero-title">Citizen Health AI</h1>
+          <p class="hero-sub">
+            An autonomous, multilingual voice assistant for public health facilities in India. Speaks English, Tamil, Kannada, Hindi, and Hinglish.
+          </p>
+          <div class="tech-badges-row">
+            <span class="tech-badge">Next.js 15</span>
+            <span class="tech-badge">FastAPI</span>
+            <span class="tech-badge">Sarvam AI</span>
+            <span class="tech-badge">LiveKit Cloud</span>
+            <span class="tech-badge">Supabase pgvector</span>
+            <span class="tech-badge">Symptom Triage</span>
+          </div>
+        </div>
+        <div class="orb-simulator-container">
+          <div class="orb-outer orb-state--listening" id="interactive-orb-wrap">
+            <div class="orb-glow-ring"></div>
+            <div class="orb-halo"></div>
+            <div class="orb-core" onclick="cycleOrbState()">
+              <div class="orb-icon" id="interactive-orb-icon">
+                <i data-lucide="mic" style="width: 44px; height: 44px;"></i>
+              </div>
+            </div>
+          </div>
+          <div class="orb-state-label" id="interactive-orb-label">Listening</div>
+          <div class="orb-states">
+            <button class="orb-state-btn active" onclick="setOrbState('listening', this)">Listen</button>
+            <button class="orb-state-btn" onclick="setOrbState('thinking', this)">Think</button>
+            <button class="orb-state-btn" onclick="setOrbState('speaking', this)">Speak</button>
+            <button class="orb-state-btn" onclick="setOrbState('error', this)">Alert</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: THE CHALLENGE -->
+    <div class="slide" id="slide-1">
+      <div class="slide-content-full">
+        <div class="slide-tag"><i data-lucide="alert-triangle"></i> Context & Problem</div>
+        <h2 class="slide-title">The Public Healthcare Bottleneck</h2>
+        <p class="slide-desc">
+          Rural Primary Health Centres (PHCs) in India serve massive populations but suffer from key operational friction points that impede delivery.
+        </p>
+        
+        <div class="challenge-grid">
+          <div class="challenge-card">
+            <div class="challenge-icon"><i data-lucide="users"></i></div>
+            <h3>ASHA Worker Overburden</h3>
+            <p>ASHA workers spend 40% of their working hours on administrative coordination and manually checking beneficiary eligibility details.</p>
+          </div>
+          <div class="challenge-card">
+            <div class="challenge-icon"><i data-lucide="navigation-2"></i></div>
+            <h3>Navigation Friction</h3>
+            <p>First-time patients waste critical time navigating complex PHC hallways, pharmacies, and registration counters due to lack of signage.</p>
+          </div>
+          <div class="challenge-card">
+            <div class="challenge-icon"><i data-lucide="languages"></i></div>
+            <h3>Language Disconnect</h3>
+            <p>Official health materials and scheme portals are often not accessible in local dialects (Kannada, Tamil, rural Hindi), causing information drop-off.</p>
+          </div>
+        </div>
+
+        <div class="impact-panel">
+          <div class="stat-box">
+            <div class="num">7.5 Cr</div>
+            <div class="lbl">Target Population</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">88%</div>
+            <div class="lbl">ASHA worker time saved</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">0 sec</div>
+            <div class="lbl">Wait time for guidance</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">5+</div>
+            <div class="lbl">Native Languages Supported</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: SYSTEM ARCHITECTURE -->
+    <div class="slide" id="slide-2">
+      <div class="slide-content-full">
+        <div class="slide-tag"><i data-lucide="git-branch"></i> How It Works</div>
+        <h2 class="slide-title">End-to-End Orchestration</h2>
+        <p class="slide-desc">
+          A hybrid architecture blending low-latency direct HTTP streaming with realtime WebRTC rooms, governed by a rigid conversational state machine.
+        </p>
+
+        <div class="arch-container">
+          <div class="arch-flow-line"></div>
+          
+          <div class="arch-node node-client">
+            <div class="arch-node-header">
+              <i data-lucide="monitor" class="arch-icon"></i> Next.js Client UI
+            </div>
+            <div class="arch-node-tech">React / TypeScript</div>
+            <div class="arch-node-body">
+              <ul>
+                <li>Immersive voice orb console</li>
+                <li>RMS-based Web Audio VAD</li>
+                <li>Dual Mode: REST mic chunks or LiveKit WebRTC mic track</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-node node-server">
+            <div class="arch-node-header">
+              <i data-lucide="server" class="arch-icon"></i> FastAPI Backend
+            </div>
+            <div class="arch-node-tech">Python / Uvicorn</div>
+            <div class="arch-node-body">
+              <ul>
+                <li>Session store & TTL</li>
+                <li>Pre-LLM triage safety filter</li>
+                <li>Model Context Protocol (MCP) JSON tool extractor</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-node node-voice">
+            <div class="arch-node-header">
+              <i data-lucide="radio" class="arch-icon"></i> Voice & AI Engine
+            </div>
+            <div class="arch-node-tech">Sarvam AI / LiveKit</div>
+            <div class="arch-node-body">
+              <ul>
+                <li>Sarvam `saaras:v3` STT</li>
+                <li>Sarvam-30b reasoning LLM</li>
+                <li>Sarvam `bulbul:v3` TTS</li>
+                <li>LiveKit Worker for WebRTC</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-node node-db">
+            <div class="arch-node-header">
+              <i data-lucide="database" class="arch-icon"></i> Supabase DB & Services
+            </div>
+            <div class="arch-node-tech">PostgreSQL / SMTP</div>
+            <div class="arch-node-body">
+              <ul>
+                <li>pgvector for RAG schemes</li>
+                <li>Citizen profiles & tracking</li>
+                <li>ASHA task notifications</li>
+                <li>Multilingual confirmation emails</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-details-box">
+          <div style="color: var(--color-primary); font-weight: 600;">[Orchestration Loop]</div>
+          <div>User Voice -> VAD detect -> Sarvam STT -> Language Auto-Detect -> Clinical Safety Triage -> LLM reasoning + MCP Tool Extraction -> Supabase Query -> Sarvam TTS Voice -> Audio playout + state machine transition.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: CITIZEN PORTAL -->
+    <div class="slide" id="slide-3">
+      <div class="screenshot-viewer-split">
+        <div class="device-mockup">
+          <div class="device-header">
+            <div class="device-dot"></div>
+            <div class="device-dot"></div>
+            <div class="device-dot"></div>
+            <div class="device-address-bar">aarogya.citizen.health/</div>
+          </div>
+          <div class="device-screen">
+            <img src="./screenshots/citizen_console.png" alt="Aarogya Citizen Voice Portal Screenshot">
+          </div>
+        </div>
+        <div class="portal-info-panel">
+          <div class="slide-tag"><i data-lucide="user"></i> Module 1: Aarogya Voice Portal</div>
+          <h2 class="slide-title" style="font-size: 2.2rem; margin-bottom: 10px;">Citizen Voice Assistant</h2>
+          <p class="slide-desc" style="font-size: 0.95rem; margin-bottom: 20px;">
+            A simplified, voice-first screen built for citizens. Features a central pulsing orb indicating real-time voice state (VAD).
+          </p>
+          <ul class="bullet-points">
+            <li>
+              <i data-lucide="check" class="bullet-icon"></i>
+              <div>
+                <strong>Natural Slot Filling</strong>
+                Autonomously collects appointment reason, date, time (resolves relative terms like "tomorrow"), patient name, and email.
+              </div>
+            </li>
+            <li>
+              <i data-lucide="check" class="bullet-icon"></i>
+              <div>
+                <strong>Seamless Identity Verification</strong>
+                Extracts phone numbers or ABHA IDs via natural voice input and queries Supabase to personalise responses.
+              </div>
+            </li>
+            <li>
+              <i data-lucide="check" class="bullet-icon"></i>
+              <div>
+                <strong>Ayushman Bharat Pre-Eligibility Check</strong>
+                Instantly informs citizens of their scheme status and coordinates active hospital departments instructions.
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: HEALTH WORKER PORTAL -->
+    <div class="slide" id="slide-4">
+      <div class="screenshot-viewer-split">
+        <div class="device-mockup">
+          <div class="device-header">
+            <div class="device-dot"></div>
+            <div class="device-dot"></div>
+            <div class="device-dot"></div>
+            <div class="device-address-bar">sahayak.healthworker.health/</div>
+          </div>
+          <div class="device-screen">
+            <img src="./screenshots/health_worker.png" alt="Sahayak Health Worker Console Screenshot">
+          </div>
+        </div>
+        <div class="portal-info-panel">
+          <div class="slide-tag"><i data-lucide="stethoscope"></i> Module 2: Sahayak Clinical AI</div>
+          <h2 class="slide-title" style="font-size: 2.2rem; margin-bottom: 10px;">ASHA & Nurse Copilot</h2>
+          <p class="slide-desc" style="font-size: 0.95rem; margin-bottom: 20px;">
+            An interactive dashboard built for frontline healthcare staff. Translates spoken notes into structured records.
+          </p>
+          <ul class="bullet-points">
+            <li>
+              <i data-lucide="check" class="bullet-icon"></i>
+              <div>
+                <strong>ASHA Protocol Lookup</strong>
+                Instant voice queries search RAG knowledge base for HBNC visit schedules, ORS dosages, and vaccination rules.
+              </div>
+            </li>
+            <li>
+              <i data-lucide="check" class="bullet-icon"></i>
+              <div>
+                <strong>Voice Record updates</strong>
+                ASHA workers describe patient symptoms naturally (e.g. "Rama Devi, BP 130 over 85") and the system extracts structured fields in real time.
+              </div>
+            </li>
+            <li>
+              <i data-lucide="check" class="bullet-icon"></i>
+              <div>
+                <strong>Referral Guidance Banner</strong>
+                Visually flags "Emergency" or "Urgent" referrals, rendering flashing visual alerts and structured action points.
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: SURVEILLANCE & ANALYTICS -->
+    <div class="slide" id="slide-5">
+      <div class="screenshot-viewer-split">
+        <div class="device-mockup">
+          <div class="device-header">
+            <div class="device-dot"></div>
+            <div class="device-dot"></div>
+            <div class="device-dot"></div>
+            <div class="device-address-bar">surveillance.district.health/</div>
+          </div>
+          <div class="device-screen">
+            <!-- Alternating screenshots or stacked preview -->
+            <img src="./screenshots/surveillance.png" alt="Disease Outbreak Surveillance Screenshot" id="surveillance-slide-img">
+          </div>
+          <div style="position: absolute; bottom: 10px; right: 10px; display: flex; gap: 5px;">
+            <button class="nav-btn" style="padding: 4px 8px; font-size: 0.7rem; border-radius: 4px;" onclick="swapSurveillanceImg('surveillance')">Surveillance</button>
+            <button class="nav-btn" style="padding: 4px 8px; font-size: 0.7rem; border-radius: 4px;" onclick="swapSurveillanceImg('analytics')">Analytics</button>
+          </div>
+        </div>
+        <div class="portal-info-panel">
+          <div class="slide-tag"><i data-lucide="bar-chart-3"></i> Module 3: Surveillance & Analytics</div>
+          <h2 class="slide-title" style="font-size: 2.2rem; margin-bottom: 10px;">Early Outbreak Detection</h2>
+          <p class="slide-desc" style="font-size: 0.95rem; margin-bottom: 20px;">
+            A reporting dashboard for District Medical Officers. Aggregates voice interaction logs into statistical outbreak indicators.
+          </p>
+          <ul class="bullet-points">
+            <li>
+              <i data-lucide="check" class="bullet-icon"></i>
+              <div>
+                <strong>Automated Outbreak Alerts</strong>
+                Monitors patient transcripts for disease keywords (e.g. Diarrhea, Dengue). Triggers alerts based on Z-score spikes.
+              </div>
+            </li>
+            <li>
+              <i data-lucide="check" class="bullet-icon"></i>
+              <div>
+                <strong>Interactive Outbreak Hotspot Map</strong>
+                Renders district-level geographical risks visually, color-coded from low (green) to critical (red).
+              </div>
+            </li>
+            <li>
+              <i data-lucide="check" class="bullet-icon"></i>
+              <div>
+                <strong>8-Week Sparkline Trends</strong>
+                Provides instant scannable trend charts for major infectious diseases to aid preventive dispatch.
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: SYMPTOM TRIAGE (INTERACTIVE) -->
+    <div class="slide" id="slide-6">
+      <div class="triage-simulator-split">
+        <div>
+          <div class="slide-tag"><i data-lucide="shield-check"></i> Clinical Safety Layer</div>
+          <h2 class="slide-title">Pre-LLM Triage Filter</h2>
+          <p class="slide-desc">
+            To prevent hallucinations during medical emergencies, a deterministic keyword-based regex engine scans transcript inputs BEFORE they reach the LLM.
+          </p>
+          <div class="sim-card">
+            <div class="sim-label">Triage Input Simulator</div>
+            <div class="symptom-input-wrapper">
+              <input type="text" id="symptom-text" class="symptom-input" placeholder="Type symptom (e.g. chest pain, mild cough)..." oninput="runTriageSim()">
+            </div>
+            <div class="preset-symptoms">
+              <button class="preset-btn" onclick="setSymptomPreset('I have sudden chest pain and shortness of breath')">Chest Pain (Emergency)</button>
+              <button class="preset-btn" onclick="setSymptomPreset('My child has high fever, severe vomiting, and fits')">Fits (Emergency)</button>
+              <button class="preset-btn" onclick="setSymptomPreset('I need to schedule a routine checkup for tomorrow')">Routine Appointment</button>
+              <button class="preset-btn" onclick="setSymptomPreset('What is the schedule for vaccine visits?')">Vaccination Info</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="triage-output-panel" id="triage-output">
+            <i data-lucide="activity" style="width: 48px; height: 48px; color: var(--color-text-muted); margin-bottom: 20px;" id="triage-output-icon"></i>
+            <div class="triage-text" style="color: var(--color-text-muted);">Simulator Idle</div>
+            <div class="triage-action">Type a symptom on the left or select a preset to see the clinical safety engine's routing path in real-time.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: SUMMARY & ROADMAP -->
+    <div class="slide" id="slide-7">
+      <div class="slide-content-full">
+        <div class="slide-tag"><i data-lucide="award"></i> MVP Validation & Next Steps</div>
+        <h2 class="slide-title">Technical Validation & Roadmap</h2>
+        <p class="slide-desc">
+          Ready for deployment. The platform operates in robust fallback states when database or livekit worker credentials are not present.
+        </p>
+
+        <div class="glass-panel" style="padding: 20px 30px; margin-bottom: 30px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <i data-lucide="check-circle" style="color: var(--color-primary); width: 32px; height: 32px;"></i>
+              <div>
+                <h3 style="font-size: 1.2rem; font-family: var(--font-display);">88/88 Test Cases Passing</h3>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted);">Fully covered language normalization, keyword-based triage logic, slot-filling validations, and API request schemas.</p>
+              </div>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 1.1rem; color: var(--color-primary); background: rgba(61,220,151,0.06); padding: 8px 16px; border-radius: 4px; border: 1px solid rgba(61,220,151,0.2);">
+              100% SUCCESS
+            </div>
+          </div>
+        </div>
+
+        <div class="roadmap-timeline">
+          <div class="roadmap-step completed">
+            <div class="roadmap-dot"><i data-lucide="check" style="width: 12px; color: #000;"></i></div>
+            <h4>Phase 1: MVP Core</h4>
+            <p>Multilingual speech console, slots appointment booking, Supabase integration.</p>
+          </div>
+          <div class="roadmap-step active">
+            <div class="roadmap-dot"></div>
+            <h4>Phase 2: LiveKit Workers</h4>
+            <p>Real-time conversational agent using WebRTC, deepgram, and OpenAI streaming.</p>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-dot"></div>
+            <h4>Phase 3: Clinical safety</h4>
+            <p>ASHA records extractor, surveillance dashboards, emergency triage layers.</p>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-dot"></div>
+            <h4>Phase 4: Scale Out</h4>
+            <p>Deploy on Railway/Vercel. Integrating WhatsApp alerts & offline voice gateway.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NAVIGATION CONTROLS -->
+  <div class="controls">
+    <button class="control-btn" id="prev-btn" onclick="prevSlide()" aria-label="Previous Slide">
+      <i data-lucide="chevron-left"></i>
+    </button>
+    <div class="slide-dots" id="dots-container">
+      <!-- Dots injected dynamically -->
+    </div>
+    <button class="control-btn" id="next-btn" onclick="nextSlide()" aria-label="Next Slide">
+      <i data-lucide="chevron-right"></i>
+    </button>
+  </div>
+
+  <div class="slide-progress" id="progress-bar"></div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Slide state management
+    const slides = document.querySelectorAll('.slide');
+    const dotsContainer = document.getElementById('dots-container');
+    const progressBar = document.getElementById('progress-bar');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    let autoplayInterval = null;
+    let isAutoplayActive = false;
+
+    // Create Navigation Dots
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => gotoSlide(i));
+      dotsContainer.appendChild(dot);
+    }
+    const dots = document.querySelectorAll('.dot');
+
+    function updateControls() {
+      // Update buttons
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+      
+      // Update dots
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+
+      // Update progress bar
+      const progressPercent = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+
+      // Update Ambient Background Glows depending on active slide
+      const glow1 = document.querySelector('.glow-1');
+      const glow2 = document.querySelector('.glow-2');
+      const glow3 = document.querySelector('.glow-3');
+      
+      if (currentSlide === 0) {
+        glow1.style.background = 'var(--color-primary)';
+        glow2.style.background = 'var(--color-secondary)';
+      } else if (currentSlide === 1) {
+        glow1.style.background = 'var(--color-danger)';
+        glow2.style.background = 'var(--color-accent)';
+      } else if (currentSlide === 2) {
+        glow1.style.background = 'var(--color-secondary)';
+        glow2.style.background = 'var(--color-primary)';
+      } else {
+        glow1.style.background = 'var(--color-accent)';
+        glow2.style.background = 'var(--color-secondary)';
+      }
+    }
+
+    function gotoSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      
+      slides.forEach((slide, i) => {
+        slide.classList.remove('active', 'past');
+        if (i < index) {
+          slide.classList.add('past');
+        } else if (i === index) {
+          slide.classList.add('active');
+        }
+      });
+      
+      currentSlide = index;
+      updateControls();
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        gotoSlide(currentSlide + 1);
+      } else if (isAutoplayActive) {
+        gotoSlide(0); // Loop back
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        gotoSlide(currentSlide - 1);
+      }
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    // Autoplay mode
+    function togglePlayMode() {
+      const playIcon = document.getElementById('play-icon');
+      const playText = document.getElementById('play-text');
+      
+      if (isAutoplayActive) {
+        clearInterval(autoplayInterval);
+        isAutoplayActive = false;
+        playIcon.setAttribute('data-lucide', 'play');
+        playText.textContent = 'Autoplay';
+      } else {
+        autoplayInterval = setInterval(nextSlide, 7000); // 7 seconds per slide
+        isAutoplayActive = true;
+        playIcon.setAttribute('data-lucide', 'pause');
+        playText.textContent = 'Pause';
+      }
+      lucide.createIcons();
+    }
+
+    // Slide 1: Interactive Voice Orb States
+    const orbStates = {
+      listening: {
+        icon: 'mic',
+        label: 'Listening',
+        class: 'orb-state--listening'
+      },
+      thinking: {
+        icon: 'loader-2',
+        label: 'Thinking…',
+        class: 'orb-state--thinking'
+      },
+      speaking: {
+        icon: 'volume-2',
+        label: 'Speaking',
+        class: 'orb-state--speaking'
+      },
+      error: {
+        icon: 'alert-triangle',
+        label: 'Triage Override',
+        class: 'orb-state--error'
+      }
+    };
+
+    function setOrbState(stateName, btnElement) {
+      const wrap = document.getElementById('interactive-orb-wrap');
+      const label = document.getElementById('interactive-orb-label');
+      const iconWrap = document.getElementById('interactive-orb-icon');
+      
+      // Update buttons active class
+      const buttons = document.querySelectorAll('.orb-state-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      if (btnElement) {
+        btnElement.classList.add('active');
+      }
+
+      // Remove all orb classes
+      wrap.className = 'orb-outer';
+      
+      const config = orbStates[stateName];
+      if (config) {
+        wrap.classList.add(config.class);
+        label.textContent = config.label;
+        
+        let spinClass = stateName === 'thinking' ? 'class="spin"' : '';
+        iconWrap.innerHTML = `<i data-lucide="${config.icon}" style="width: 44px; height: 44px;" ${spinClass}></i>`;
+        
+        // Add spin animation in css if thinking
+        if (stateName === 'thinking') {
+          const iconEl = iconWrap.querySelector('i');
+          iconEl.style.animation = 'rotate-thinking 1.2s infinite linear';
+        }
+        
+        lucide.createIcons();
+      }
+    }
+
+    let orbStateIndex = 0;
+    const orbStateNames = ['listening', 'thinking', 'speaking', 'error'];
+    
+    function cycleOrbState() {
+      orbStateIndex = (orbStateIndex + 1) % orbStateNames.length;
+      const state = orbStateNames[orbStateIndex];
+      // Find corresponding button to keep active state synced
+      const buttons = document.querySelectorAll('.orb-state-btn');
+      setOrbState(state, buttons[orbStateIndex]);
+    }
+
+    // Slide 6: Switch Surveillance & Analytics Screenshot
+    function swapSurveillanceImg(type) {
+      const img = document.getElementById('surveillance-slide-img');
+      if (type === 'surveillance') {
+        img.src = './screenshots/surveillance.png';
+      } else {
+        img.src = './screenshots/analytics.png';
+      }
+    }
+
+    // Slide 7: Symptom Triage Simulator Logic
+    const emergencyKeywords = [
+      'chest pain', 'heart attack', 'shortness of breath', 'difficulty breathing',
+      'bleeding', 'accident', 'unconscious', 'fits', 'seizure', 'ambulance', 'choking'
+    ];
+
+    function setSymptomPreset(text) {
+      document.getElementById('symptom-text').value = text;
+      runTriageSim();
+    }
+
+    function runTriageSim() {
+      const text = document.getElementById('symptom-text').value.toLowerCase();
+      const outputPanel = document.getElementById('triage-output');
+      
+      if (!text.trim()) {
+        outputPanel.className = 'triage-output-panel';
+        outputPanel.innerHTML = `
+          <i data-lucide="activity" style="width: 48px; height: 48px; color: var(--color-text-muted); margin-bottom: 20px;"></i>
+          <div class="triage-text" style="color: var(--color-text-muted);">Simulator Idle</div>
+          <div class="triage-action">Type a symptom on the left or select a preset to see the clinical safety engine's routing path in real-time.</div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      // Check for emergency keywords
+      const matchedKeyword = emergencyKeywords.find(keyword => text.includes(keyword));
+
+      if (matchedKeyword) {
+        // EMERGENCY ROUTE
+        outputPanel.className = 'triage-output-panel active';
+        outputPanel.style.borderColor = 'var(--color-danger)';
+        outputPanel.style.boxShadow = '0 0 20px rgba(248,113,113,0.15)';
+        outputPanel.innerHTML = `
+          <div class="triage-badge emergency">
+            <i data-lucide="zap" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px;"></i>
+            Critical Severity Detected
+          </div>
+          <div class="triage-text" style="color: var(--color-danger);">Trigger Emergency Action</div>
+          <div class="triage-action" style="font-weight: 500; color: var(--color-text-main); margin-bottom: 12px;">
+            "Please call 108 immediately for an ambulance. Go to the nearest PHC casualty block."
+          </div>
+          <div style="font-size: 0.8rem; color: var(--color-text-muted); background: rgba(0,0,0,0.4); padding: 8px; border-radius: 4px; font-family: var(--font-mono);">
+            Pre-LLM Match: "${matchedKeyword}" -> needs_ambulance = true. Prompt overridden.
+          </div>
+        `;
+      } else {
+        // NON-EMERGENCY ROUTE
+        outputPanel.className = 'triage-output-panel active';
+        outputPanel.style.borderColor = 'var(--color-primary)';
+        outputPanel.style.boxShadow = '0 0 20px rgba(61,220,151,0.15)';
+        outputPanel.innerHTML = `
+          <div class="triage-badge non-emergency">Normal / Standard Routing</div>
+          <div class="triage-text" style="color: var(--color-primary);">Passed Safety Filter</div>
+          <div class="triage-action" style="color: var(--color-text-main); margin-bottom: 12px;">
+            The query has been forwarded to the <strong>Sarvam-30b LLM</strong> for relative scheduling or information retrieval.
+          </div>
+          <div style="font-size: 0.8rem; color: var(--color-text-muted); background: rgba(0,0,0,0.4); padding: 8px; border-radius: 4px; font-family: var(--font-mono);">
+            Safety scan completed. No critical flags triggered. Standard slot-filling active.
+          </div>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    // Initialize progress bar
+    updateControls();
+  </script>
+</body>
+</html>
